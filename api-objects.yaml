@@ -157,9 +157,9 @@ items:
         - env:
           - name: GITLAB_OMNIBUS_CONFIG
             value: hostname='localhost'; external_url "http://#{hostname}/" unless
-              hostname.to_s == ''; root_pass=''; gitlab_rails['initial_root_password']=root_pass
+              hostname.to_s == ''; root_pass=ENV['GITLAB_ROOT_PASSWORD']; gitlab_rails['initial_root_password']=root_pass
               unless root_pass.to_s == ''; postgresql['enable']=false; gitlab_rails['db_host']
-              = 'gitlab-ce-postgresql'; gitlab_rails['db_password']=ENV['RAILS_DB_PASSWORD'];
+              = 'gitlab-ce-postgresql'; gitlab_rails['db_password']=ENV['POSTGRESQL_PASSWORD'];
               gitlab_rails['db_username']='userJMY'; gitlab_rails['db_database']='gitlabhq_production';
               redis['enable'] = false; gitlab_rails['redis_host']='gitlab-ce-redis';
               unicorn['worker_processes'] = 2; manage_accounts['enable'] = true; manage_storage_directories['manage_etc']
@@ -168,8 +168,16 @@ items:
               gitlab_rails['shared_path'] = '/gitlab-data/shared'; gitlab_rails['uploads_directory']
               = '/gitlab-data/uploads'; gitlab_ci['builds_directory'] = '/gitlab-data/builds';
               prometheus_monitoring['enable'] = false;
-          - name: RAILS_DB_PASSWORD
-            value: OqaJnS53XSBpMu7J
+          - name: GITLAB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: GITLAB_ROOT_PASSWORD
+                name: gitlab-secrets
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRESQL_PASSWORD
+                name: gitlab-secrets
           image: gitlab/gitlab-ce@sha256:ca60810514f390994e2db3cd5d0a7f973fd5b560607f3c7df3378e3f833d2fbe
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -261,9 +269,8 @@ items:
             - /usr/bin/scl
             - enable
             - rh-postgresql94
-            - export PGPASSWORD='wGCmPL0S5PAXglYK'; psql -h 'gitlab-ce-postgresql'
-              -U postgres -d gitlabhq_production -c 'CREATE EXTENSION IF NOT EXISTS
-              pg_trgm;'
+            - export PGPASSWORD; psql -h 'gitlab-ce-postgresql' -U postgres -d gitlabhq_production
+              -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
             containerName: gitlab-ce-postgresql
             env:
             - name: HOME
@@ -272,6 +279,11 @@ items:
               value: /var/lib/pgsql/data/userdata
             - name: CONTAINER_SCRIPTS_PATH
               value: /usr/share/container-scripts/postgresql
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRESQL_ADMIN_PASSWORD
+                  name: gitlab-secrets
           failurePolicy: Abort
         timeoutSeconds: 600
       resources: {}
@@ -290,11 +302,17 @@ items:
           - name: POSTGRESQL_USER
             value: userJMY
           - name: POSTGRESQL_PASSWORD
-            value: OqaJnS53XSBpMu7J
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRESQL_PASSWORD
+                name: gitlab-secrets
           - name: POSTGRESQL_DATABASE
             value: gitlabhq_production
           - name: POSTGRESQL_ADMIN_PASSWORD
-            value: wGCmPL0S5PAXglYK
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRESQL_ADMIN_PASSWORD
+                name: gitlab-secrets
           image: centos/postgresql-94-centos7@sha256:44ac1cd56f0aa019ee7f158df411386d707dd61db63f768282cc38dcc0d0f6f3
           imagePullPolicy: IfNotPresent
           livenessProbe:
