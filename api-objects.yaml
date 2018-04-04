@@ -52,7 +52,7 @@ items:
     creationTimestamp: null
     labels:
       createdBy: gitlab-ce-template
-    name: gitlab-ce-data
+    name: gitlab-data
   spec:
     accessModes:
     - ReadWriteOnce
@@ -67,7 +67,7 @@ items:
     creationTimestamp: null
     labels:
       createdBy: gitlab-ce-template
-    name: gitlab-ce-etc
+    name: etc-gitlab
   spec:
     accessModes:
     - ReadWriteOnce
@@ -82,7 +82,7 @@ items:
     creationTimestamp: null
     labels:
       createdBy: gitlab-ce-template
-    name: gitlab-ce-postgresql
+    name: postgresql
   spec:
     accessModes:
     - ReadWriteOnce
@@ -97,7 +97,7 @@ items:
     creationTimestamp: null
     labels:
       createdBy: gitlab-ce-template
-    name: gitlab-ce-redis-data
+    name: redis-data
   spec:
     accessModes:
     - ReadWriteOnce
@@ -217,21 +217,21 @@ items:
           terminationMessagePolicy: File
           volumeMounts:
           - mountPath: /etc/gitlab
-            name: gitlab-ce-volume-1
+            name: etc-gitlab
           - mountPath: /gitlab-data
-            name: gitlab-ce-volume-2
+            name: gitlab-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
         volumes:
-        - name: gitlab-ce-volume-1
+        - name: etc-gitlab
           persistentVolumeClaim:
-            claimName: gitlab-ce-etc
-        - name: gitlab-ce-volume-2
+            claimName: etc-gitlab
+        - name: gitlab-data
           persistentVolumeClaim:
-            claimName: gitlab-ce-data
+            claimName: gitlab-data
     test: false
     triggers:
     - type: ConfigChange
@@ -351,16 +351,16 @@ items:
           terminationMessagePolicy: File
           volumeMounts:
           - mountPath: /var/lib/pgsql/data
-            name: gitlab-ce-volume-3
+            name: postgresql
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
         volumes:
-        - name: gitlab-ce-volume-3
+        - name: postgresql
           persistentVolumeClaim:
-            claimName: gitlab-ce-postgresql
+            claimName: postgresql
     test: false
     triggers:
     - type: ConfigChange
@@ -427,16 +427,16 @@ items:
           terminationMessagePolicy: File
           volumeMounts:
           - mountPath: /data
-            name: gitlab-ce-volume-4
+            name: redis-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
         volumes:
-        - name: gitlab-ce-volume-4
+        - name: redis-data
           persistentVolumeClaim:
-            claimName: gitlab-ce-redis-data
+            claimName: redis-data
     test: false
     triggers:
     - type: ConfigChange
