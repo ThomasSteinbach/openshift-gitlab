@@ -47,63 +47,55 @@ items:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
+    annotations: {}
     creationTimestamp: null
-    labels:
-      createdBy: gitlab-ce-template
-    name: gitlab-data
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 5Gi
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    labels:
-      createdBy: gitlab-ce-template
     name: etc-gitlab
   spec:
     accessModes:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 100Mi
+        storage: 1Gi
+    volumeName: gitlab-etc-gitlab
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
+    annotations: {}
     creationTimestamp: null
-    labels:
-      createdBy: gitlab-ce-template
+    name: gitlab-data
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    volumeName: gitlab-gitlab-data
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations: {}
+    creationTimestamp: null
     name: postgresql
   spec:
     accessModes:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 2Gi
+        storage: 5Gi
+    volumeName: gitlab-postgresql
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
+    annotations: {}
     creationTimestamp: null
-    labels:
-      createdBy: gitlab-ce-template
     name: redis-data
   spec:
     accessModes:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 512Mi
+        storage: 2Gi
+    volumeName: gitlab-redis-data
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
@@ -313,7 +305,7 @@ items:
               secretKeyRef:
                 key: POSTGRESQL_ADMIN_PASSWORD
                 name: gitlab-secrets
-          image: centos/postgresql-94-centos7@sha256:44ac1cd56f0aa019ee7f158df411386d707dd61db63f768282cc38dcc0d0f6f3
+          image: centos/postgresql-94-centos7@sha256:57af739295f099a9167b21a9b7f5854771466a06963d06a1529558cff7aa2687
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
