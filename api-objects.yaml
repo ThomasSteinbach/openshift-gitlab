@@ -75,14 +75,14 @@ items:
   metadata:
     annotations: {}
     creationTimestamp: null
-    name: postgresql
+    name: var-lib-pgsql-data
   spec:
     accessModes:
     - ReadWriteOnce
     resources:
       requests:
         storage: 5Gi
-    volumeName: gitlab-postgresql
+    volumeName: gitlab-var-lib-pgsql-data
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
@@ -343,16 +343,16 @@ items:
           terminationMessagePolicy: File
           volumeMounts:
           - mountPath: /var/lib/pgsql/data
-            name: postgresql
+            name: var-lib-pgsql-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
         volumes:
-        - name: postgresql
+        - name: var-lib-pgsql-data
           persistentVolumeClaim:
-            claimName: postgresql
+            claimName: var-lib-pgsql-data
     test: false
     triggers:
     - type: ConfigChange
