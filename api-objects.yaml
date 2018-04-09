@@ -404,10 +404,32 @@ items:
           - -ec
           image: redis@sha256:49e794b32c129d1ab1ee9f99c0e602f57ea1329aebe641843e0743c8ee336a7e
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - redis-cli -h $(hostname) ping
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
           name: gitlab-ce-redis
           ports:
           - containerPort: 6379
             protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - redis-cli -h $(hostname) ping
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
           resources:
             limits:
               cpu: '1'
