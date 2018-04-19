@@ -75,19 +75,6 @@ items:
   metadata:
     annotations: {}
     creationTimestamp: null
-    name: var-lib-pgsql-data
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 5Gi
-    volumeName: gitlab-var-lib-pgsql-data
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    annotations: {}
-    creationTimestamp: null
     name: redis-data
   spec:
     accessModes:
@@ -96,6 +83,19 @@ items:
       requests:
         storage: 2Gi
     volumeName: gitlab-redis-data
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations: {}
+    creationTimestamp: null
+    name: var-lib-pgsql-data
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+    volumeName: gitlab-var-lib-pgsql-data
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
@@ -148,18 +148,14 @@ items:
         containers:
         - env:
           - name: GITLAB_OMNIBUS_CONFIG
-            value: hostname='localhost'; external_url "http://#{hostname}/" unless
-              hostname.to_s == ''; root_pass=ENV['GITLAB_ROOT_PASSWORD']; gitlab_rails['initial_root_password']=root_pass
+            value: hostname='gitlab.xarif.de'; external_url "http://#{hostname}/"
+              unless hostname.to_s == ''; root_pass=ENV['GITLAB_ROOT_PASSWORD']; gitlab_rails['initial_root_password']=root_pass
               unless root_pass.to_s == ''; postgresql['enable']=false; gitlab_rails['db_host']
               = 'gitlab-ce-postgresql'; gitlab_rails['db_password']=ENV['POSTGRESQL_PASSWORD'];
               gitlab_rails['db_username']='userJMY'; gitlab_rails['db_database']='gitlabhq_production';
               redis['enable'] = false; gitlab_rails['redis_host']='gitlab-ce-redis';
               unicorn['worker_processes'] = 2; manage_accounts['enable'] = true; manage_storage_directories['manage_etc']
-              = false; gitlab_shell['auth_file'] = '/gitlab-data/ssh/authorized_keys';
-              git_data_dirs({ 'default' => { 'path' => '/gitlab-data/git-data' } });
-              gitlab_rails['shared_path'] = '/gitlab-data/shared'; gitlab_rails['uploads_directory']
-              = '/gitlab-data/uploads'; gitlab_ci['builds_directory'] = '/gitlab-data/builds';
-              prometheus_monitoring['enable'] = false;
+              = false; prometheus_monitoring['enable'] = false;
           - name: GITLAB_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -210,7 +206,7 @@ items:
           volumeMounts:
           - mountPath: /etc/gitlab
             name: etc-gitlab
-          - mountPath: /gitlab-data
+          - mountPath: /var/opt/gitlab
             name: gitlab-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
@@ -305,7 +301,7 @@ items:
               secretKeyRef:
                 key: POSTGRESQL_ADMIN_PASSWORD
                 name: gitlab-secrets
-          image: centos/postgresql-94-centos7@sha256:57af739295f099a9167b21a9b7f5854771466a06963d06a1529558cff7aa2687
+          image: centos/postgresql-94-centos7@sha256:6a44d9cbfca6abbbbc41e10886548d46aa453eb6edab1dd1f867dfc930c4327b
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -475,10 +471,6 @@ items:
     name: gitlab-ce
   spec:
     ports:
-    - name: 22-ssh
-      port: 22
-      protocol: TCP
-      targetPort: 22
     - name: 80-http
       port: 80
       protocol: TCP
@@ -531,17 +523,33 @@ items:
     sessionAffinity: None
     type: ClusterIP
 - apiVersion: v1
-  kind: Route
+  kind: Service
   metadata:
-    annotations:
-      openshift.io/host.generated: 'true'
     creationTimestamp: null
     labels:
       app: gitlab-ce
-      createdBy: gitlab-ce-template
-    name: gitlab-ce
+    name: gitlab-ce-ssh
   spec:
-    host: gitlab-ce-OC_PROJECT_NAME.127.0.0.1.nip.io
+    externalTrafficPolicy: Cluster
+    ports:
+    - name: 22-ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22
+    selector:
+      app: gitlab-ce
+      deploymentconfig: gitlab-ce
+    sessionAffinity: None
+    type: NodePort
+- apiVersion: v1
+  kind: Route
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: gitlab-ce
+    name: gitlab-xarif
+  spec:
+    host: OC_PROJECT_NAME.xarif.de
     port:
       targetPort: 80-http
     to:
