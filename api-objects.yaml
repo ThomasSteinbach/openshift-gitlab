@@ -148,8 +148,9 @@ items:
         containers:
         - env:
           - name: GITLAB_OMNIBUS_CONFIG
-            value: hostname='gitlab.xarif.de'; external_url "http://#{hostname}/"
-              unless hostname.to_s == ''; root_pass=ENV['GITLAB_ROOT_PASSWORD']; gitlab_rails['initial_root_password']=root_pass
+            value: hostname='gitlab.xarif.de'; external_url "https://#{hostname}/"
+              unless hostname.to_s == ''; nginx['listen_https'] = false; nginx['listen_port']
+              = 80; root_pass=ENV['GITLAB_ROOT_PASSWORD']; gitlab_rails['initial_root_password']=root_pass
               unless root_pass.to_s == ''; postgresql['enable']=false; gitlab_rails['db_host']
               = 'gitlab-ce-postgresql'; gitlab_rails['db_password']=ENV['POSTGRESQL_PASSWORD'];
               gitlab_rails['db_username']='userJMY'; gitlab_rails['db_database']='gitlabhq_production';
@@ -525,6 +526,7 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
+    annotations: {}
     creationTimestamp: null
     labels:
       app: gitlab-ce
@@ -544,6 +546,7 @@ items:
 - apiVersion: v1
   kind: Route
   metadata:
+    annotations: {}
     creationTimestamp: null
     labels:
       app: gitlab-ce
@@ -552,6 +555,8 @@ items:
     host: OC_PROJECT_NAME.xarif.de
     port:
       targetPort: 80-http
+    tls:
+      termination: edge
     to:
       kind: Service
       name: gitlab-ce
