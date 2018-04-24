@@ -556,6 +556,7 @@ items:
     port:
       targetPort: 80-http
     tls:
+      insecureEdgeTerminationPolicy: Redirect
       termination: edge
     to:
       kind: Service
