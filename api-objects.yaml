@@ -17,7 +17,7 @@ items:
     - annotations: null
       from:
         kind: DockerImage
-        name: gitlab/gitlab-ce:10.5.2-ce.0
+        name: gitlab/gitlab-ce:10.8.1-ce.0
       importPolicy: {}
       name: production
       referencePolicy:
@@ -167,7 +167,7 @@ items:
               secretKeyRef:
                 key: POSTGRESQL_PASSWORD
                 name: gitlab-secrets
-          image: gitlab/gitlab-ce@sha256:ca60810514f390994e2db3cd5d0a7f973fd5b560607f3c7df3378e3f833d2fbe
+          image: gitlab/gitlab-ce@sha256:04d98653304c506c762397f857bac525c9a9075464b0afa30e4d242b371e0a25
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 30
@@ -302,7 +302,7 @@ items:
               secretKeyRef:
                 key: POSTGRESQL_ADMIN_PASSWORD
                 name: gitlab-secrets
-          image: centos/postgresql-94-centos7@sha256:6a44d9cbfca6abbbbc41e10886548d46aa453eb6edab1dd1f867dfc930c4327b
+          image: docker.io/centos/postgresql-94-centos7@sha256:cd3490b48b1345fd6d32916af277ef963a345dfc400dc37ea38edf30502af406
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
