@@ -67,6 +67,17 @@ items:
       referencePolicy:
         type: Source
 - apiVersion: v1
+  data:
+    CI_SERVER_URL: https://gitlab.xarif.de/
+    REGISTER_NON_INTERACTIVE: 'true'
+    RUNNER_EXECUTOR: docker
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: gitlab-runner
+    name: gitlab-runner
+- apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
     annotations: {}
