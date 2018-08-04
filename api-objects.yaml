@@ -69,8 +69,10 @@ items:
 - apiVersion: v1
   data:
     CI_SERVER_URL: https://gitlab.xarif.de/
+    DOCKER_IMAGE: alpine:latest
     REGISTER_NON_INTERACTIVE: 'true'
     RUNNER_EXECUTOR: docker
+    RUNNER_NAME: default-docker-runner
   kind: ConfigMap
   metadata:
     creationTimestamp: null
@@ -530,6 +532,18 @@ items:
               name: gitlab-runner-secrets
           image: gitlab/gitlab-runner@sha256:19289cb174a49aec58d635ad14d21243a26de842645b5cc8bea8c8e5d2c27599
           imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - gitlab-runner
+                - register
+            preStop:
+              exec:
+                command:
+                - gitlab-runner
+                - unregister
+                - --all-runners
           name: gitlab-runner
           resources: {}
           terminationMessagePath: /dev/termination-log
