@@ -63,7 +63,7 @@ items:
         kind: DockerImage
         name: gitlab/gitlab-runner:alpine-v10.8.2
       importPolicy: {}
-      name: alpine-v10.8.2
+      name: production
       referencePolicy:
         type: Source
 - apiVersion: v1
@@ -498,14 +498,10 @@ items:
       deploymentconfig: gitlab-runner
     strategy:
       activeDeadlineSeconds: 21600
-      resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
+      recreateParams:
         timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
+      resources: {}
+      type: Recreate
     template:
       metadata:
         annotations:
@@ -546,7 +542,7 @@ items:
         - gitlab-runner
         from:
           kind: ImageStreamTag
-          name: gitlab-runner:alpine-v10.8.2
+          name: gitlab-runner:production
           namespace: OC_PROJECT_NAME
       type: ImageChange
 - apiVersion: v1
