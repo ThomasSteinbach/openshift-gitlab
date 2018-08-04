@@ -523,27 +523,22 @@ items:
           deploymentconfig: gitlab-runner
       spec:
         containers:
-        - image: gitlab/gitlab-runner@sha256:19289cb174a49aec58d635ad14d21243a26de842645b5cc8bea8c8e5d2c27599
+        - envFrom:
+          - configMapRef:
+              name: gitlab-runner
+          - secretRef:
+              name: gitlab-runner-secrets
+          image: gitlab/gitlab-runner@sha256:19289cb174a49aec58d635ad14d21243a26de842645b5cc8bea8c8e5d2c27599
           imagePullPolicy: IfNotPresent
           name: gitlab-runner
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /etc/gitlab-runner
-            name: gitlab-runner-1
-          - mountPath: /home/gitlab-runner
-            name: gitlab-runner-2
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
-        volumes:
-        - emptyDir: {}
-          name: gitlab-runner-1
-        - emptyDir: {}
-          name: gitlab-runner-2
     test: false
     triggers:
     - type: ConfigChange
