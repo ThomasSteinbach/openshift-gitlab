@@ -56,14 +56,6 @@ items:
     lookupPolicy:
       local: false
     tags:
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: 172.30.1.1:5000/OC_PROJECT_NAME/gitlab-runner:alpine-v10.8.2
-      importPolicy: {}
-      name: alpine-v10.8.2
-      referencePolicy:
-        type: ''
     - annotations:
         openshift.io/generated-by: OpenShiftWebConsole
         openshift.io/imported-from: gitlab/gitlab-runner:alpine-v10.8.2
