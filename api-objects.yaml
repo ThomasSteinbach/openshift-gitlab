@@ -63,6 +63,16 @@ items:
         kind: DockerImage
         name: gitlab/gitlab-runner:alpine-v10.8.2
       importPolicy: {}
+      name: alpine-v10.8.2
+      referencePolicy:
+        type: Source
+    - annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+        openshift.io/imported-from: gitlab/gitlab-runner:alpine-v10.8.2
+      from:
+        kind: DockerImage
+        name: gitlab/gitlab-runner:alpine-v10.8.2
+      importPolicy: {}
       name: production
       referencePolicy:
         type: Source
@@ -501,6 +511,12 @@ items:
       recreateParams:
         timeoutSeconds: 600
       resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
       type: Recreate
     template:
       metadata:
@@ -631,6 +647,7 @@ items:
 - apiVersion: v1
   kind: Route
   metadata:
+    annotations: {}
     creationTimestamp: null
     labels:
       app: gitlab-ce
