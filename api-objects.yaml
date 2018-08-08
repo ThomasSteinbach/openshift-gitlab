@@ -3,6 +3,28 @@ items:
 - apiVersion: v1
   kind: ImageStream
   metadata:
+    annotations: {}
+    creationTimestamp: null
+    labels:
+      app: docker-dind
+    name: docker-dind
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+        openshift.io/imported-from: library/docker:stable-dind
+      from:
+        kind: DockerImage
+        name: library/docker:stable-dind
+      importPolicy: {}
+      name: stable-dind
+      referencePolicy:
+        type: Source
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
     annotations:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
@@ -155,6 +177,64 @@ items:
   metadata:
     creationTimestamp: null
     name: privilegeduser
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    labels:
+      app: docker-dind
+    name: docker-dind
+  spec:
+    replicas: 1
+    selector:
+      app: docker-dind
+      deploymentconfig: docker-dind
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftWebConsole
+        creationTimestamp: null
+        labels:
+          app: docker-dind
+          deploymentconfig: docker-dind
+      spec:
+        containers:
+        - image: library/docker@sha256:9b8e48796e2c1f65e9e026658eb93895853706e66887391222c2b9869c17e784
+          imagePullPolicy: IfNotPresent
+          name: docker-dind
+          ports:
+          - containerPort: 2375
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: privilegeduser
+        serviceAccountName: privilegeduser
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - docker-dind
+        from:
+          kind: ImageStreamTag
+          name: docker-dind:stable-dind
+          namespace: OC_PROJECT_NAME
+      type: ImageChange
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -580,6 +660,25 @@ items:
           name: gitlab-runner:production
           namespace: OC_PROJECT_NAME
       type: ImageChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    labels:
+      app: docker-dind
+    name: docker-dind
+  spec:
+    ports:
+    - name: 2375-tcp
+      port: 2375
+      protocol: TCP
+      targetPort: 2375
+    selector:
+      deploymentconfig: docker-dind
+    sessionAffinity: None
+    type: ClusterIP
 - apiVersion: v1
   kind: Service
   metadata:
