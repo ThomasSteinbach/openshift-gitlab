@@ -91,8 +91,10 @@ items:
 - apiVersion: v1
   data:
     CI_SERVER_URL: https://gitlab.xarif.de/
+    DOCKER_HOST: tcp://docker-dind.OC_PROJECT_NAME.svc:2375/
     DOCKER_IMAGE: alpine:latest
     DOCKER_PRIVILEGED: 'true'
+    DOCKER_VOLUMES: /var/run/docker.sock:/var/run/docker.sock
     REGISTER_NON_INTERACTIVE: 'true'
     RUNNER_EXECUTOR: docker
     RUNNER_NAME: default-docker-runner
