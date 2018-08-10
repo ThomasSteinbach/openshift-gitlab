@@ -88,6 +88,55 @@ items:
         type: Source
 - apiVersion: v1
   data:
+    GITLAB_OMNIBUS_CONFIG: 'hostname=''gitlab.xarif.de'';
+
+      external_url "https://#{hostname}/" unless hostname.to_s == '''';
+
+      nginx[''listen_https''] = false;
+
+      nginx[''listen_port''] = 80;
+
+      registry_external_url ''https://gitlab-registry.xarif.de'';
+
+      registry_nginx[''listen_port''] = 8443;
+
+      registry_nginx[''listen_https''] = false;
+
+      registry_nginx[''proxy_set_headers''] = { "Host" => "$http_host", "X-Real-IP"
+      => "$remote_addr", "X-Forwarded-For" => "$proxy_add_x_forwarded_for", "X-Forwarded-Proto"
+      => "https", "X-Forwarded-Ssl" => "on"};
+
+      root_pass=ENV[''GITLAB_ROOT_PASSWORD''];
+
+      gitlab_rails[''initial_root_password'']=root_pass unless root_pass.to_s == '''';
+
+      postgresql[''enable'']=false;
+
+      gitlab_rails[''db_host''] = ''gitlab-ce-postgresql'';
+
+      gitlab_rails[''db_password'']=ENV[''POSTGRESQL_PASSWORD''];
+
+      gitlab_rails[''db_username'']=''userJMY'';
+
+      gitlab_rails[''db_database'']=''gitlabhq_production'';
+
+      redis[''enable''] = false;
+
+      gitlab_rails[''redis_host'']=''gitlab-ce-redis'';
+
+      unicorn[''worker_processes''] = 2;
+
+      manage_accounts[''enable''] = true;
+
+      manage_storage_directories[''manage_etc''] = false;
+
+      prometheus_monitoring[''enable''] = false;'
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: null
+    name: gitlab-ce
+- apiVersion: v1
+  data:
     CI_SERVER_URL: https://gitlab.xarif.de/
     DOCKER_HOST: tcp://docker-dind.OC_PROJECT_NAME.svc:2375/
     DOCKER_IMAGE: alpine:latest
@@ -272,21 +321,6 @@ items:
       spec:
         containers:
         - env:
-          - name: GITLAB_OMNIBUS_CONFIG
-            value: "hostname='gitlab.xarif.de'; external_url \"https://#{hostname}/\"\
-              \ unless hostname.to_s == ''; nginx['listen_https'] = false; nginx['listen_port']\
-              \ = 80; registry_external_url 'https://gitlab-registry.xarif.de'; registry_nginx['listen_port']\
-              \ = 8443;  registry_nginx['listen_https'] = false; registry_nginx['proxy_set_headers']\
-              \ = {\n  \"Host\" => \"$http_host\",\n  \"X-Real-IP\" => \"$remote_addr\"\
-              ,\n  \"X-Forwarded-For\" => \"$proxy_add_x_forwarded_for\",\n  \"X-Forwarded-Proto\"\
-              \ => \"https\",\n  \"X-Forwarded-Ssl\" => \"on\"\n}; root_pass=ENV['GITLAB_ROOT_PASSWORD'];\
-              \ gitlab_rails['initial_root_password']=root_pass unless root_pass.to_s\
-              \ == ''; postgresql['enable']=false; gitlab_rails['db_host'] = 'gitlab-ce-postgresql';\
-              \ gitlab_rails['db_password']=ENV['POSTGRESQL_PASSWORD']; gitlab_rails['db_username']='userJMY';\
-              \ gitlab_rails['db_database']='gitlabhq_production'; redis['enable']\
-              \ = false; gitlab_rails['redis_host']='gitlab-ce-redis'; unicorn['worker_processes']\
-              \ = 2; manage_accounts['enable'] = true; manage_storage_directories['manage_etc']\
-              \ = false; prometheus_monitoring['enable'] = false;"
           - name: GITLAB_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -297,6 +331,9 @@ items:
               secretKeyRef:
                 key: POSTGRESQL_PASSWORD
                 name: gitlab-secrets
+          envFrom:
+          - configMapRef:
+              name: gitlab-ce
           image: gitlab/gitlab-ce@sha256:03bad28bc2d041d0a0fcb0ad9fb1a6466a9519cd981b1694cb954057b56fa7c0
           imagePullPolicy: IfNotPresent
           livenessProbe:
