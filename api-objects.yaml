@@ -778,6 +778,7 @@ items:
 - apiVersion: v1
   kind: Route
   metadata:
+    annotations: {}
     creationTimestamp: null
     labels:
       app: gitlab-ce
@@ -792,26 +793,6 @@ items:
     to:
       kind: Service
       name: gitlab-ce
-      weight: 100
-    wildcardPolicy: None
-- apiVersion: v1
-  kind: Route
-  metadata:
-    annotations: {}
-    creationTimestamp: null
-    labels:
-      app: gitlab-ce
-    name: gitlab-ce-ssh
-  spec:
-    host: ssh.OC_PROJECT_NAME.xarif.de
-    port:
-      targetPort: 22-ssh
-    tls:
-      insecureEdgeTerminationPolicy: Redirect
-      termination: edge
-    to:
-      kind: Service
-      name: gitlab-ce-ssh
       weight: 100
     wildcardPolicy: None
 - apiVersion: v1
