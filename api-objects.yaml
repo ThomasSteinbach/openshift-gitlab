@@ -143,6 +143,7 @@ items:
     DOCKER_IMAGE: alpine:latest
     DOCKER_PRIVILEGED: 'true'
     DOCKER_VOLUMES: /var/run/docker.sock:/var/run/docker.sock;/sys/fs/cgroup:/sys/fs/cgroup:ro
+    REGISTER_LOCKED: 'false'
     REGISTER_NON_INTERACTIVE: 'true'
     RUNNER_EXECUTOR: docker
     RUNNER_NAME: default-docker-runner
