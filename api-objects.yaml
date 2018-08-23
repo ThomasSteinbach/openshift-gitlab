@@ -664,7 +664,7 @@ items:
               name: gitlab-runner
           - secretRef:
               name: gitlab-runner-secrets
-          image: thomass/gitlab-runner@sha256:4cb27de95ef7b05e93f40fa1be784d78a6e76bef10ee4735b937f282e40e26b2
+          image: thomass/gitlab-runner@sha256:5578d4e1932e10b0ba3c104120c9485f6c37006e315872b18675ae29da181e61
           imagePullPolicy: IfNotPresent
           name: gitlab-runner
           resources: {}
