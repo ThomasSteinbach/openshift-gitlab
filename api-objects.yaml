@@ -81,7 +81,7 @@ items:
     - annotations: null
       from:
         kind: DockerImage
-        name: gitlab/gitlab-runner:alpine-v11.1.0
+        name: thomass/gitlab-runner:latest
       importPolicy: {}
       name: production
       referencePolicy:
@@ -133,6 +133,7 @@ items:
       prometheus_monitoring[''enable''] = false;'
   kind: ConfigMap
   metadata:
+    annotations: {}
     creationTimestamp: null
     name: gitlab-ce
 - apiVersion: v1
@@ -141,7 +142,7 @@ items:
     DOCKER_HOST: tcp://docker-dind.OC_PROJECT_NAME.svc:2375/
     DOCKER_IMAGE: alpine:latest
     DOCKER_PRIVILEGED: 'true'
-    DOCKER_VOLUMES: /var/run/docker.sock:/var/run/docker.sock
+    DOCKER_VOLUMES: /var/run/docker.sock:/var/run/docker.sock;/sys/fs/cgroup:/sys/fs/cgroup:ro
     REGISTER_NON_INTERACTIVE: 'true'
     RUNNER_EXECUTOR: docker
     RUNNER_NAME: default-docker-runner
@@ -258,7 +259,7 @@ items:
           deploymentconfig: docker-dind
       spec:
         containers:
-        - image: library/docker@sha256:9b8e48796e2c1f65e9e026658eb93895853706e66887391222c2b9869c17e784
+        - image: library/docker@sha256:7c62e5842c563c1a9739146474df2e11d40b10d36365c96fe6be89527b3f1c5c
           imagePullPolicy: IfNotPresent
           name: docker-dind
           ports:
@@ -662,20 +663,8 @@ items:
               name: gitlab-runner
           - secretRef:
               name: gitlab-runner-secrets
-          image: gitlab/gitlab-runner@sha256:dfee8602ca094d08a80b97f6282a6b3a258160985792c314232cd239f683c945
+          image: thomass/gitlab-runner@sha256:4cb27de95ef7b05e93f40fa1be784d78a6e76bef10ee4735b937f282e40e26b2
           imagePullPolicy: IfNotPresent
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                - gitlab-runner
-                - register
-            preStop:
-              exec:
-                command:
-                - gitlab-runner
-                - unregister
-                - --all-runners
           name: gitlab-runner
           resources: {}
           terminationMessagePath: /dev/termination-log
